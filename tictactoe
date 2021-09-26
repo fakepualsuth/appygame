@@ -1,0 +1,177 @@
+# this function checks if a datatype is correct
+def validate_int(prompt, err):
+    while True:
+        try:
+            user_input = int(input(prompt))
+            return user_input
+        except:
+            print(err)
+            continue
+
+
+# This class is responsible for keeping track of repeating games
+class TicTacToe:
+
+    def __init__(self, playerone, playertwo, board):
+        self.board = board
+        self.playerone = playerone
+        self.playertwo = playertwo
+        self.number_of_games = 1
+
+    # This asks for the number of games the players want to play and then creates a new game each time.
+    # When all the games have been played, it determines the overall winner.
+    def create_new_game(self):
+        self.number_of_games = validate_int("How many games would you like to play?\n", "Please enter a number.")
+        print("Tic Tac Toe!")
+        print("Player One! Enter your name:")
+        self.playerone.choose_name()
+        print("Player Two! Enter your name:")
+        self.playertwo.choose_name()
+        for i in range(self.number_of_games):
+            self.board.__init__(self.playerone, self.playertwo)
+            self.board.start()
+            if self.board.winner == self.playerone:
+                self.playerone.wins += 1
+            elif self.board.winner == self.playertwo:
+                self.playertwo.wins += 1
+            elif self.board.winner is None:
+                continue
+            print(f"{self.playerone.name}: {self.playerone.wins} wins")
+            print(f"{self.playertwo.name}: {self.playertwo.wins} wins")
+        if self.playerone.wins > self.playertwo.wins:
+            print(f"Congratulations {self.playerone.name}!")
+        elif self.playertwo.wins > self.playerone.wins:
+            print(f"Congratulations {self.playertwo.name}!")
+        elif self.playerone.wins == self.playertwo.wins:
+            print("You have a tie!")
+
+
+
+class Board:
+
+    def __init__(self, playerone, playertwo):
+        self.playerone = playerone
+        self.playertwo = playertwo
+        self.topRow = [" ", " ", " "]
+        self.midRow = [" ", " ", " "]
+        self.btmRow = [" ", " ", " "]
+        self.divider = "--+---+--"
+        self.grid = [self.topRow, self.midRow, self.btmRow]
+        # grid dictionary is for placing a symbol in a spot using a tuple to determine the location
+        self.gridDict = {
+            "q": (0, 0), "w": (0, 1), "e": (0, 2),
+            "a": (1, 0), "s": (1, 1), "d": (1, 2),
+            "z": (2, 0), "x": (2, 1), "c": (2, 2)
+        }
+        # this list contains the all of the winning combinations
+        self.winningCombinations = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8],
+                                    [2, 4, 6]]
+        self.numberOfTurns = 0
+        self.winner = None
+
+    def create_board(self):
+        print("\n")
+        for i in range(len(self.grid)):
+            print(" | ".join(self.grid[i]))
+            if i < 2:
+                print(self.divider)
+        print("\n")
+
+    # The guide board is just to instruct the player which letter corresponds to which spot
+    def guide_board(self):
+        topRow = ["q", "w", "e"]
+        midRow = ["a", "s", "d"]
+        btmRow = ["z", "x", "c"]
+        divider = "--+---+--"
+        grid = [topRow, midRow, btmRow]
+        for i in range(len(grid)):
+            print(" | ".join(grid[i]))
+            if i < 2:
+                print(divider)
+
+    def start(self):
+        self.create_board()
+        self.numberOfTurns = 0
+        print(f"{self.playerone.name}!")
+        self.playerone.choose_symbol()
+        self.next_turn()
+
+    def next_turn(self):
+        self.numberOfTurns += 1
+        if self.numberOfTurns % 2 == 0:
+            print(f"{self.playertwo.name} ({self.playertwo.symbol}), your turn!")
+            playerTwo.symbol_placement()
+        else:
+            print(f"{self.playerone.name} ({self.playerone.symbol}), your turn!")
+            playerOne.symbol_placement()
+
+    def check_if_won(self):
+        dataList = []
+        # this creates a list of symbols based on the spots in the board
+        for i in range(len(self.grid)):
+            for j in range(len(self.grid[i])):
+                dataList.append(self.grid[i][j])
+        check = self.winningCombinations
+        # this function loops over the winning combinations and compares it to the list of symbols
+        for i in range(len(check)):
+            if dataList[check[i][0]] == dataList[check[i][1]] == dataList[check[i][2]] == playerTwo.symbol:
+                self.winner = playerTwo
+            elif dataList[check[i][0]] == dataList[check[i][1]] == dataList[check[i][2]] == playerOne.symbol:
+                self.winner = playerOne
+        if self.winner is not None and self.numberOfTurns < 9:
+            print(f"{self.winner.name} wins!")
+        elif self.numberOfTurns == 9:
+            print("The game is a tie!")
+        else:
+            self.next_turn()
+            
+      
+class Player:
+
+    def __init__(self):
+        self.symbol = ""
+        self.score = 0
+        self.name = ""
+        self.wins = 0
+
+    def choose_name(self):
+        self.name = input()
+
+    def choose_symbol(self):
+        userSymbol = input("Are you playing as noughts or crosses? \nEnter [O] or [X]\n").upper()
+        if userSymbol == "O" or userSymbol == "X":
+            self.symbol = userSymbol
+        else:
+            print("Invalid character. Try again.\n")
+            self.choose_symbol()
+        if userSymbol == "O":
+            playerTwo.symbol = "X"
+        else:
+            playerTwo.symbol = "O"
+
+    #   Alternate between player placing symbol and board checking if a player has won
+    def symbol_placement(self):
+        newGame.guide_board()
+        while True:
+            response = input("\nWhere are you placing a symbol?\n")
+            placement = newGame.gridDict.get(response)
+            if placement is None:
+                print("Invalid response!")
+                continue
+            else:
+                row = newGame.grid[placement[0]]
+                if row[placement[1]] != " ":
+                    print("This spot is already taken!")
+                    continue
+                else:
+                    row[placement[1]] = self.symbol
+                    break
+        newGame.create_board()
+        newGame.check_if_won()
+
+
+playerOne = Player()
+playerTwo = Player()
+newGame = Board(playerOne, playerTwo)
+a = TicTacToe(playerOne, playerTwo, newGame)
+a.create_new_game()
