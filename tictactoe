@@ -124,3 +124,54 @@ class Board:
             print("The game is a tie!")
         else:
             self.next_turn()
+            
+      
+class Player:
+
+    def __init__(self):
+        self.symbol = ""
+        self.score = 0
+        self.name = ""
+        self.wins = 0
+
+    def choose_name(self):
+        self.name = input()
+
+    def choose_symbol(self):
+        userSymbol = input("Are you playing as noughts or crosses? \nEnter [O] or [X]\n").upper()
+        if userSymbol == "O" or userSymbol == "X":
+            self.symbol = userSymbol
+        else:
+            print("Invalid character. Try again.\n")
+            self.choose_symbol()
+        if userSymbol == "O":
+            playerTwo.symbol = "X"
+        else:
+            playerTwo.symbol = "O"
+
+    #   Alternate between player placing symbol and board checking if a player has won
+    def symbol_placement(self):
+        newGame.guide_board()
+        while True:
+            response = input("\nWhere are you placing a symbol?\n")
+            placement = newGame.gridDict.get(response)
+            if placement is None:
+                print("Invalid response!")
+                continue
+            else:
+                row = newGame.grid[placement[0]]
+                if row[placement[1]] != " ":
+                    print("This spot is already taken!")
+                    continue
+                else:
+                    row[placement[1]] = self.symbol
+                    break
+        newGame.create_board()
+        newGame.check_if_won()
+
+
+playerOne = Player()
+playerTwo = Player()
+newGame = Board(playerOne, playerTwo)
+a = TicTacToe(playerOne, playerTwo, newGame)
+a.create_new_game()
